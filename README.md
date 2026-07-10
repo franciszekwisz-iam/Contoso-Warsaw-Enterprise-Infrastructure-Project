@@ -14,19 +14,16 @@ The environment bridges traditional on-premises infrastructure with cloud-native
 
 ### Architectural Specifications
 * **Corporate Entity:** Contoso Warsaw
-* **On-Premises FQDN:** `corp.contosowarsaw.pl`
+* **On-Premises FQDN:** `contosowarsaw.com`
 * **Cloud Tenant Primary Domain:** `Contosowarsaw.onmicrosoft.com`
-* **Primary Domain Controller:** `W-DC01` (Static IP: `10.10.10.10/24`)
+* **Primary Domain Controller:** `W-DC01` (Static IP: `192.168.10.10/24`)
 
 ---
 
 ## 3. Project Roadmap & Implementation Lifecycle
 
-### [📁 00-architecture-and-design](./00-architecture-and-design/)
-* **Definition of Done:** Corporate standards defined, high-level architecture diagram completed, repository skeleton initialized.
-
 ### [📁 01-infrastructure-base](./01-infrastructure-base/)
-* **Definition of Done:** `W-DC01` deployment, AD DS promotion, corporate OU tree design, automated onboarding of 150 users via PowerShell (`New-ADUser`), AGDLP group framework implementation, NTFS file share permissions.
+* **Definition of Done:** `W-DC01` deployment, AD DS promotion to `contosowarsaw.com`, corporate OU tree design, automated onboarding of 150 users via PowerShell (`New-ADUser`), AGDLP group framework implementation, NTFS file share permissions.
 
 ### [📁 02-hybrid-identity-entra](./02-hybrid-identity-entra/)
 * **Definition of Done:** Alternative UPN suffixes added, Entra Connect Sync engine installation and filtering, soft/hard-match validations, hybrid user lifecycle testing.
@@ -46,5 +43,5 @@ The environment bridges traditional on-premises infrastructure with cloud-native
 Every technical block within this repository is considered complete *only* when it satisfies the following criteria:
 1. **Functional Environment:** The configuration is live and verified on the lab environment.
 2. **PowerShell Automation:** Critical processes are handled via production-ready scripts.
-3. **Monolithic README:** Complete documentation embedded into a single, comprehensive `README.md` within the module folder (Scenario, Design, Implementation, Validation, Lessons Learned).
+3. **Monolithic README:** Complete documentation embedded into a single, comprehensive `README.md` within the module folder.
 4. **Visual Evidence:** Relevant configuration screenshots and architecture diagrams stored in local assets.
