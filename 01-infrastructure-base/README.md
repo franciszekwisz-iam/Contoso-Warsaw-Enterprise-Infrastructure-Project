@@ -12,7 +12,7 @@ This section documents the deployment of the core infrastructure layer required 
 
 ### 1.2 Domain Controller Specification (`W-DC01`)
 * **Operating System:** Windows Server 2022 Standard (Desktop Experience)
-* **Compute Resources:** 2 vCPUs, 4096 MB RAM, 50 GB Storage
+* **Compute Resources:** 2 vCPUs, 6144 MB RAM, 50 GB Storage
 * **Base Software:** VirtualBox Guest Additions installed for driver stabilization.
 
 ### 1.3 Core Networking & Identity Configuration
