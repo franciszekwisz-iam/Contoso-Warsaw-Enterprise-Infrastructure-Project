@@ -414,35 +414,6 @@ A module is considered complete only when all of the following criteria are met:
 
 ---
 
-# Out of Scope
-
-The project intentionally does not focus on:
-
-- Cisco networking
-- Linux administration
-- Kubernetes
-- Software development
-- Azure infrastructure engineering (AZ-104 level)
-- DevOps pipelines
-
-The primary focus remains Microsoft Enterprise Infrastructure, Identity, Security, Microsoft 365 administration, and automation.
-
----
-
-# Current Status
-
-Project Status: **In Progress**
-
-Current Phase:
-
-**01 — Infrastructure Foundation**
-
-Current Module:
-
-**Active Directory + PowerShell Administration**
-
----
-
 # Long-Term Objective
 
 By the end of this project the entire repository will represent a fully documented Microsoft enterprise environment demonstrating practical skills in:
