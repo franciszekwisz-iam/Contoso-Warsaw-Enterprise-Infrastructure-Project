@@ -27,6 +27,8 @@ During the initial deployment phase of the Active Directory domain controller (`
 * Created a new **Pointer (PTR)** record within the newly established `10.168.192.in-addr.arpa` zone.
 * Mapped host IP address octet `10` directly to the Fully Qualified Domain Name (FQDN) of the DC: `w-dc01.contosowarsaw.com.`.
 
+![proof](assets/image2.png)
+
 #### Step D: DNS Forwarders Configuration
 * Configured external DNS Forwarders using Cloudflare's public DNS resolver IP: `1.1.1.1`.
 * *Architectural Note:* Due to the isolated sandbox nature of this lab (VirtualBox host-only/internal network interface with no external routing), the DNS manager console currently displays a validation warning/error for the forwarder. This behavior is expected and correct under isolated network conditions.
