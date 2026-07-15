@@ -30,7 +30,7 @@ During the initial deployment phase of the Active Directory domain controller (`
 #### Step D: DNS Forwarders Configuration
 * Configured external DNS Forwarders using Cloudflare's public DNS resolver IP: `1.1.1.1`.
 * *Architectural Note:* Due to the isolated sandbox nature of this lab (VirtualBox host-only/internal network interface with no external routing), the DNS manager console currently displays a validation warning/error for the forwarder. This behavior is expected and correct under isolated network conditions.
-
+!image.png
 ---
 
 ### 3. Verification & Diagnostic Proofs
