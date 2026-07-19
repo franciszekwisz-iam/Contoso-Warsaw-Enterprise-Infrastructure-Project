@@ -1,0 +1,190 @@
+# PowerShell Deployment Script
+
+The following script performs the complete deployment automatically:
+
+* Detects current AD Domain
+* Retrieves Distinguished Name
+* Retrieves NetBIOS Domain Name
+* Creates folder structure
+* Creates SMB shares
+* Creates AGDLP groups
+* Configures group nesting
+* Disables inheritance
+* Removes Users and Authenticated Users
+* Assigns Modify permissions
+* Grants Management access to all folders
+
+```powershell
+# =====================================================================
+# File Server Deployment - AGDLP Model
+# Server: W-DC01
+# =====================================================================
+
+Import-Module ActiveDirectory
+
+$RootPath = "C:\Shares"
+
+$Departments = @(
+    "HR",
+    "IT",
+    "Finance",
+    "Sales",
+    "Management"
+)
+
+# ---------------------------------------------------------------------
+# Detect Domain Information
+# ---------------------------------------------------------------------
+
+$Domain = Get-ADDomain
+
+$DomainDN = $Domain.DistinguishedName
+$NetBIOS  = $Domain.NetBIOSName
+
+Write-Host "Domain DN: $DomainDN"
+Write-Host "NetBIOS: $NetBIOS"
+
+# ---------------------------------------------------------------------
+# Create Root Folder
+# ---------------------------------------------------------------------
+
+if (!(Test-Path $RootPath))
+{
+    New-Item -Path $RootPath -ItemType Directory -Force | Out-Null
+}
+
+# ---------------------------------------------------------------------
+# Create AD Groups
+# ---------------------------------------------------------------------
+
+foreach ($Department in $Departments)
+{
+    $GGName = "GG_$Department"
+    $DLName = "DL_Shares_${Department}_Modify"
+
+    if (-not (Get-ADGroup -Filter "Name -eq '$GGName'" -ErrorAction SilentlyContinue))
+    {
+        New-ADGroup `
+            -Name $GGName `
+            -SamAccountName $GGName `
+            -GroupScope Global `
+            -GroupCategory Security `
+            -Path "CN=Users,$DomainDN"
+    }
+
+    if (-not (Get-ADGroup -Filter "Name -eq '$DLName'" -ErrorAction SilentlyContinue))
+    {
+        New-ADGroup `
+            -Name $DLName `
+            -SamAccountName $DLName `
+            -GroupScope DomainLocal `
+            -GroupCategory Security `
+            -Path "CN=Users,$DomainDN"
+    }
+
+    try
+    {
+        Add-ADGroupMember `
+            -Identity $DLName `
+            -Members $GGName `
+            -ErrorAction Stop
+    }
+    catch {}
+}
+
+# ---------------------------------------------------------------------
+# Create Folder Structure
+# ---------------------------------------------------------------------
+
+foreach ($Department in $Departments)
+{
+    $Folder = Join-Path $RootPath $Department
+
+    if (!(Test-Path $Folder))
+    {
+        New-Item `
+            -Path $Folder `
+            -ItemType Directory `
+            -Force | Out-Null
+    }
+}
+
+# ---------------------------------------------------------------------
+# Create SMB Shares
+# ---------------------------------------------------------------------
+
+foreach ($Department in $Departments)
+{
+    $Folder = Join-Path $RootPath $Department
+
+    if (-not (Get-SmbShare -Name $Department -ErrorAction SilentlyContinue))
+    {
+        New-SmbShare `
+            -Name $Department `
+            -Path $Folder `
+            -FullAccess "Authenticated Users"
+    }
+}
+
+# ---------------------------------------------------------------------
+# Configure NTFS Permissions
+# ---------------------------------------------------------------------
+
+foreach ($Department in $Departments)
+{
+    $Folder = Join-Path $RootPath $Department
+
+    $ACL = Get-Acl $Folder
+
+    # Disable inheritance
+    $ACL.SetAccessRuleProtection($true, $true)
+
+    # Remove Users
+    foreach ($Entry in $ACL.Access)
+    {
+        if (
+            $Entry.IdentityReference -like "*\Users" -or
+            $Entry.IdentityReference -like "*\Authenticated Users"
+        )
+        {
+            $ACL.RemoveAccessRule($Entry)
+        }
+    }
+
+    Set-Acl -Path $Folder -AclObject $ACL
+
+    $ACL = Get-Acl $Folder
+
+    $DepartmentDL = "$NetBIOS\DL_Shares_${Department}_Modify"
+
+    $DepartmentRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+        $DepartmentDL,
+        "Modify",
+        "ContainerInherit,ObjectInherit",
+        "None",
+        "Allow"
+    )
+
+    $ACL.AddAccessRule($DepartmentRule)
+
+    $ManagementRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+        "$NetBIOS\DL_Shares_Management_Modify",
+        "Modify",
+        "ContainerInherit,ObjectInherit",
+        "None",
+        "Allow"
+    )
+
+    if ($Department -ne "Management")
+    {
+        $ACL.AddAccessRule($ManagementRule)
+    }
+
+    Set-Acl -Path $Folder -AclObject $ACL
+}
+
+Write-Host ""
+Write-Host "========================================="
+Write-Host " File Server Deployment Completed"
+Write-Host "========================================="
+```
