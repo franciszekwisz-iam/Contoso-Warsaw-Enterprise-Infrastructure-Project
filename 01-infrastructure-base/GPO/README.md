@@ -1,86 +1,198 @@
-# Active Directory: Centralized Management via GPO (Project Contoso)
+# Group Policy (GPO)
 
-## 📌 Project Overview
-This module focuses on implementing centralized identity and access management policies using **Group Policy Objects (GPO)** within a local Active Directory environment (`contosowarsaw.com`). The goal was to enforce the least privilege principle and automate resource provisioning for specific organizational units (OUs).
+## Module Overview
+
+This module covers the deployment and management of **Group Policy Objects (GPO)** within the Contoso Warsaw Active Directory environment.
+
+The objective was to understand how centralized configuration management works in an enterprise Windows domain and how administrators use GPOs to enforce security settings, standardize user environments, and automate workstation configuration.
 
 ---
 
-## 🏗️ Active Directory & OU Architecture
+# Objectives
 
-The environment uses a multi-layered structure to granularly apply policies depending on business roles, strictly adhering to the **LSDOU** (Local, Site, Domain, OU) inheritance hierarchy.
+- Understand the Group Policy architecture.
+- Learn the Group Policy processing order (LSDOU).
+- Create and link GPOs to Organizational Units.
+- Configure User and Computer policies.
+- Deploy common enterprise restrictions.
+- Use Group Policy Preferences (GPP).
+- Verify and troubleshoot policy application.
+- Perform basic GPO administration using PowerShell.
 
-```text
-contosowarsaw.com (Domain)
-└── SandboxOU (Organizational Unit)
-    └── Sandbox_HR (Organizational Unit)
-        └── [Target Users & Computers]
-🛠️ GPO Implementation: GPO_Workstation_Restricted
-A dedicated policy object was created and linked directly to the Sandbox_HR OU to secure workstations and provision necessary resources automatically upon user login.
+---
 
-1. Workstation Hardening (User Configuration)
-Control Panel & Settings Restriction:
+# Lab Environment
 
-Path: User Configuration -> Policies -> Administrative Templates -> Control Panel
+Domain:
 
-Setting: Prohibit access to Control Panel and PC settings -> Enabled
+contosowarsaw.com
 
-Impact: Prevents standard users from modifying system-level settings.
+Domain Controller:
 
-Command Prompt CLI Restriction:
+W-DC01
 
-Path: User Configuration -> Policies -> Administrative Templates -> System
+Management Tools:
 
-Setting: Prevent access to the command prompt -> Enabled
+- Group Policy Management Console (GPMC)
+- Active Directory Users and Computers
+- PowerShell
+- Resultant Set of Policy (RSoP)
+- Group Policy Modeling Wizard
 
-Impact: Blocks access to cmd.exe execution for standard interactive sessions.
+---
 
-2. Resource Provisioning (Group Policy Preferences - GPP)
-Network Drive Mapping (HR Share):
+# Implemented Configuration
 
-Path: User Configuration -> Preferences -> Windows Settings -> Drive Maps
+## Domain Level
 
-Configuration: Action: Create | Location: \\W-DC01\SharedHR | Letter: H:
+### Default Domain Policy
 
-Network Printer Deployment:
+Configured:
 
-Path: User Configuration -> Preferences -> Control Panel Settings -> Printers
+- Password Policy
+- Password Complexity
+- Password Length
+- Password Age
+- Account Lockout Policy
 
-Configuration: Shared Printer | Path: \\W-DC01\HR-Printer | Set as Default: True
+---
 
-3. Automation Scripts (Logon Script)
-Path: User Configuration -> Policies -> Windows Settings -> Scripts (Logon/Logoff) -> Logon
+## Department GPO
 
-File: welcome.bat (Stored securely in the domain SYSVOL share)
+Created:
 
-Payload:
+GPO_Workstation_Restricted
 
-DOS
-@echo off
-msg * Witaj w strukturze Contoso HR!
-🔍 Verification & Troubleshooting (IAM Toolkit)
-To ensure high availability and proper policy enforcement without disrupting production, advanced validation techniques were used:
+Linked to:
 
-1. Group Policy Modeling (Simulation)
-Generated simulated policy results via gpmc.msc (Group Policy Modeling Wizard).
+OU=HR
 
-Resolved the standard MMC security warning by bypassing the about:security_mmc.exe restriction.
+Implemented settings:
 
-Result Matrix:
+- Disable Control Panel
+- Disable Command Prompt (CMD)
+- Desktop restrictions
+- User configuration policies
 
-Applied GPOs: GPO_Workstation_Restricted (Successfully processed).
+---
 
-Security Filtering: Verified correct target matching for the user container contosowarsaw.com/SandboxOU/Sandbox_HR.
+## Group Policy Preferences (GPP)
 
-2. PowerShell Infrastructure Validation
-Automated verification scripts were executed on the Domain Controller (W-DC01) to validate the replication and link state:
+Configured:
 
-PowerShell
-# 1. Check GPO core metadata and GUID status
-Get-GPO -Name "GPO_Workstation_Restricted"
+- Network Drive Mapping
 
-# 2. Verify inheritance and active links for the HR organizational unit
-Get-GPInheritance -Target "OU=Sandbox_HR,OU=SandboxOU,DC=contosowarsaw,DC=com"
-💡 Key Architectural Takeaways for Interviews
-The Password Policy Exception: While the LSDOU rule states that policies linked closer to the object (OU level) override higher levels (Domain level), standard Password Policies are a hardcoded exception in Active Directory. They must be applied at the root of the domain (Default Domain Policy) to take effect for domain accounts, unless Fine-Grained Password Policies (FGPP) are explicitly configured.
+Example:
 
-User vs. Computer Context: Applied settings operate strictly in the User Context, ensuring that restrictions follow the identity regardless of which domain-joined hardware they utilize.
+H:
+
+↓
+
+\\W-DC01\SharedHR
+
+Configured:
+
+- Default Network Printer
+
+Example:
+
+\\W-DC01\HR-Printer
+
+Configured:
+
+- Logon Script
+
+Example:
+
+welcome.bat
+
+---
+
+# Validation
+
+Verified policy deployment using:
+
+- gpupdate /force
+- gpresult /r
+- gpresult /h
+- rsop.msc
+- Group Policy Modeling Wizard
+
+Verified:
+
+- GPO link status
+- Applied GPOs
+- Inheritance
+- User scope
+- Computer scope
+
+---
+
+# PowerShell
+
+Practiced:
+
+Get-GPO
+
+Get-GPInheritance
+
+Backup-GPO
+
+Verified GPO configuration through PowerShell.
+
+---
+
+# Concepts Learned
+
+- Group Policy architecture
+- LSDOU processing order
+- GPO linking
+- Inheritance
+- Enforced
+- Block Inheritance
+- User Configuration
+- Computer Configuration
+- Group Policy Preferences
+- Troubleshooting GPO deployment
+
+---
+
+# Skills Acquired
+
+After completing this module I am able to:
+
+- Design a basic Group Policy structure.
+- Create and link GPOs.
+- Apply policies to Organizational Units.
+- Configure common enterprise user restrictions.
+- Deploy network drive mappings.
+- Configure logon scripts.
+- Manage password policies.
+- Verify policy application.
+- Troubleshoot GPO deployment.
+- Perform basic GPO administration using PowerShell.
+
+---
+
+# Definition of Done
+
+✔ Group Policy architecture understood.
+
+✔ GPOs created and linked.
+
+✔ User restrictions successfully deployed.
+
+✔ Network drive mapping configured.
+
+✔ Logon script deployed.
+
+✔ Password policy configured.
+
+✔ Policy inheritance verified.
+
+✔ Troubleshooting performed using gpresult and RSoP.
+
+✔ Basic PowerShell administration completed.
+
+---
+
