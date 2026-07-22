@@ -65,7 +65,7 @@ This module covers the end-to-end design, implementation, testing, and troublesh
 
 * **Objective:** Provision a new Marketing department in AD DS, include it in the sync scope, and verify readiness in Entra ID.
 * **Steps Completed:**
-  1. Created `OU=Marketing` in AD DS with test identities using the `@contosowarsaw.com` UPN suffix.
+  1. Created `OU=Sandbox_IT` in AD DS with test identities using the `@contosowarsaw.com` UPN suffix.
   2. Reconfigured Microsoft Entra Connect wizard via *Customize synchronization options* to include `OU=Marketing`.
   3. Triggered a full initial cycle via Windows PowerShell 5.1:
      ```powershell
@@ -87,7 +87,7 @@ This module covers the end-to-end design, implementation, testing, and troublesh
 | **Entra Connect Installation** | ✅ Completed | PHS active, OU filtering functional. |
 | **Lifecycle Testing** | ✅ Completed | Disabling, attribute sync, and Soft Delete tested. |
 | **Troubleshooting Skills** | ✅ Completed | PS 5.1 resolution, Event Viewer (ID 904), `miisclient.exe` audited. |
-| **Practical Examination** | ✅ Passed | Grade: **Junior Ready** |
+| **Practical Examination** | ✅ Passed | 
 | **Business Scenario** | ✅ Executed | Marketing OU successfully provisioned and verified. |
 
 ---
